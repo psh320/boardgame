@@ -1,36 +1,38 @@
 "use client";
 
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
 
 let socket: any;
 
 const Room = () => {
-  const router = useRouter();
-  const { roomId } = router.query;
+  const searchParams = useSearchParams();
+  const roomId = searchParams.get("roomId");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
 
   useEffect(() => {
-    socket = io();
-
     if (roomId) {
+      socket = io();
+
       socket.emit("joinRoom", roomId);
+
+      socket.on("message", (msg: any) => {
+        setMessages((prevMessages) => [...prevMessages, msg]);
+      });
+
+      return () => {
+        socket.disconnect();
+      };
     }
-
-    socket.on("message", (msg: any) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
   }, [roomId]);
 
   const sendMessage = () => {
-    socket.emit("message", { room: roomId, text: message });
-    setMessage("");
+    if (socket && roomId) {
+      socket.emit("message", { room: roomId, text: message });
+      setMessage("");
+    }
   };
 
   return (
