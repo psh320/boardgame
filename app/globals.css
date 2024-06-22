@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-100 text-base leading-normal;
+  @apply bg-gray-100 text-base leading-normal flex flex-col min-h-screen;
 }
 
 a {

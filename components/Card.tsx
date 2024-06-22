@@ -18,7 +18,7 @@ export const Card: React.FC<CardProps> = ({ gameName, link }) => {
   return (
     <div
       onClick={handleClick}
-      className="border border-gray-300 p-4 m-4 cursor-pointer rounded-lg shadow-md hover:bg-gray-200"
+      className="border border-gray-300 p-4 cursor-pointer rounded-lg shadow-md hover:bg-gray-200"
     >
       <h2 className="text-xl font-semibold">{gameName}</h2>
     </div>
