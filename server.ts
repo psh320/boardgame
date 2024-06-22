@@ -16,7 +16,7 @@ app.prepare().then(() => {
   const io = new Server(server);
 
   io.on("connection", (socket) => {
-    console.log("a user connected");
+    console.log("A user connected");
 
     socket.on("joinRoom", (room) => {
       socket.join(room);
@@ -24,12 +24,12 @@ app.prepare().then(() => {
     });
 
     socket.on("message", (msg) => {
-      console.log("message: " + msg);
+      console.log("Message received:", msg);
       io.to(msg.room).emit("message", msg);
     });
 
     socket.on("disconnect", () => {
-      console.log("user disconnected");
+      console.log("User disconnected");
     });
   });
 
