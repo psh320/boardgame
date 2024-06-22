@@ -1,12 +1,12 @@
+/* app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  background-color: #fbf8f8;
-  margin: 0;
-  font-family: Arial, sans-serif;
+  @apply bg-gray-100 text-base leading-normal;
 }
+
 a {
-  text-decoration: none;
+  @apply text-blue-500;
 }
