@@ -15,5 +15,6 @@ export async function POST(req: NextRequest) {
   const game = searchParams.get("game");
 
   // Logic to create a room for the specified game
+  // For now, we are just echoing back the roomId and game
   return NextResponse.json({ roomId, game });
 }
