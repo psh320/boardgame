@@ -1,13 +1,28 @@
-// app/wavelength/page.tsx
-import React from "react";
+"use client";
 
-const WavelengthPage: React.FC = () => {
+import { useRouter } from "next/router";
+import { useState } from "react";
+
+const WavelengthHome = () => {
+  const router = useRouter();
+  const [roomId, setRoomId] = useState("");
+
+  const createRoom = async () => {
+    const res = await fetch("/api/rooms?game=wavelength", {
+      method: "POST",
+    });
+    const data = await res.json();
+    setRoomId(data.roomId);
+    router.push(`/wavelength/${data.roomId}`);
+  };
+
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4">Wavelength</h1>
-      <p>Details about the Wavelength board game go here.</p>
+      <h1>Welcome to Wavelength</h1>
+      <button onClick={createRoom}>Create Room</button>
+      {roomId && <p>Room ID: {roomId}</p>}
     </div>
   );
 };
 
-export default WavelengthPage;
+export default WavelengthHome;
