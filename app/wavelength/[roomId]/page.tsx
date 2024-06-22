@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
-import Input from "../../components/Input";
+import Input from "../../../components/Input";
 
 let socket: any;
 
