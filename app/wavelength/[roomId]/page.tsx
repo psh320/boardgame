@@ -15,7 +15,9 @@ const Room = () => {
 
   useEffect(() => {
     if (roomId) {
-      socket = io();
+      socket = io({
+        path: "/socket.io", // Ensure the path matches the server configuration
+      });
 
       socket.on("connect", () => {
         console.log("Connected to socket.io server");

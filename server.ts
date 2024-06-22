@@ -13,7 +13,9 @@ app.prepare().then(() => {
     handle(req, res, parsedUrl);
   });
 
-  const io = new Server(server);
+  const io = new Server(server, {
+    path: "/socket.io", // Ensure the path is set correctly
+  });
 
   io.on("connection", (socket) => {
     console.log("A user connected");
