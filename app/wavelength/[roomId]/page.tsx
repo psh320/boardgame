@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
+<<<<<<<< HEAD:pages/wavelength/[roomId]/index.tsx
+import { useRouter } from "next/router";
+========
+>>>>>>>> parent of 180be8f (fix message sent):app/wavelength/[roomId]/page.tsx
 
 let socket: any;
 
@@ -12,6 +16,41 @@ const Room = () => {
   const { roomId } = router.query;
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
+
+  useEffect(() => {
+<<<<<<<< HEAD:pages/wavelength/[roomId]/index.tsx
+    if (!roomId) {
+      return;
+    }
+
+    fetch("/api/socket"); // Initialize the Socket.IO server
+========
+    if (roomId) {
+      socket = io({
+        path: "/socket.io", // Ensure the path matches the server configuration
+      });
+>>>>>>>> parent of 180be8f (fix message sent):app/wavelength/[roomId]/page.tsx
+
+      socket.on("connect", () => {
+        console.log("Connected to socket.io server");
+        socket.emit("joinRoom", roomId);
+        console.log(`Joined room: ${roomId}`);
+      });
+
+      socket.on("message", (msg: any) => {
+        console.log("Message received:", msg);
+        setMessages((prevMessages) => [...prevMessages, msg]);
+      });
+
+      socket.on("disconnect", () => {
+        console.log("Disconnected from socket.io server");
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [roomId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);

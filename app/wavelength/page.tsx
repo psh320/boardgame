@@ -14,7 +14,20 @@ const WavelengthHome = () => {
   const createRoom = async () => {
     const newRoomId = generateRoomId();
     setRoomId(newRoomId);
-    router.push(`/wavelength/${newRoomId}`);
+
+    try {
+      const res = await fetch(`/api/rooms/${newRoomId}?game=wavelength`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to create room");
+      }
+      const data = await res.json();
+      router.push(`/wavelength/${data.roomId}`);
+    } catch (error) {
+      console.error("Error creating room:", error);
+      alert("Failed to create room");
+    }
   };
 
   const joinRoom = () => {
