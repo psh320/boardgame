@@ -3,17 +3,23 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
-import Input from "../../components/Input";
-import Button from "../../components/Button";
+import Input from "../../../components/Input";
+import Button from "../../../components/Button";
+import { useRouter } from "next/router";
 
 let socket: any;
 
 const Room = () => {
-  const { roomId } = useParams();
+  const router = useRouter();
+  const { roomId } = router.query;
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!roomId) {
+      return;
+    }
+
     fetch("/api/socket"); // Initialize the Socket.IO server
 
     socket = io({
