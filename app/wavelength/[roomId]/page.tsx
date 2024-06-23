@@ -1,72 +1,59 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import io from "socket.io-client";
+import { useParams } from "next/navigation";
+import Pusher from "pusher-js";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
-<<<<<<<< HEAD:pages/wavelength/[roomId]/index.tsx
-import { useRouter } from "next/router";
-========
->>>>>>>> parent of 180be8f (fix message sent):app/wavelength/[roomId]/page.tsx
-
-let socket: any;
 
 const Room = () => {
-  const router = useRouter();
-  const { roomId } = router.query;
+  const { roomId } = useParams();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<string[]>([]);
 
   useEffect(() => {
-<<<<<<<< HEAD:pages/wavelength/[roomId]/index.tsx
-    if (!roomId) {
-      return;
-    }
+    if (!roomId) return;
 
-    fetch("/api/socket"); // Initialize the Socket.IO server
-========
-    if (roomId) {
-      socket = io({
-        path: "/socket.io", // Ensure the path matches the server configuration
-      });
->>>>>>>> parent of 180be8f (fix message sent):app/wavelength/[roomId]/page.tsx
+    // Initialize Pusher
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+    });
 
-      socket.on("connect", () => {
-        console.log("Connected to socket.io server");
-        socket.emit("joinRoom", roomId);
-        console.log(`Joined room: ${roomId}`);
-      });
+    const channel = pusher.subscribe(`presence-${roomId}`);
+    channel.bind("message", (data: { message: string }) => {
+      console.log("Message received:", data.message); // Add this log to verify message reception
+      setMessages((prevMessages) => [...prevMessages, data.message]);
+    });
 
-      socket.on("message", (msg: any) => {
-        console.log("Message received:", msg);
-        setMessages((prevMessages) => [...prevMessages, msg]);
-      });
-
-      socket.on("disconnect", () => {
-        console.log("Disconnected from socket.io server");
-      });
-
-      return () => {
-        socket.disconnect();
-      };
-    }
+    return () => {
+      pusher.unsubscribe(`presence-${roomId}`);
+    };
   }, [roomId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
 
-  const sendMessage = () => {
-    if (socket && roomId && message) {
-      const msg = { room: roomId, text: message };
-      socket.emit("message", msg);
-      console.log("Message sent:", msg);
-      setMessages((prevMessages) => [...prevMessages, msg]); // Add to chat history
-      setMessage(""); // Clear the input field
-    } else {
-      console.log("Message not sent:", { socket, roomId, message });
+  const sendMessage = async () => {
+    if (message) {
+      const res = await fetch("/api/pusher", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message, roomId }),
+      });
+      if (res.ok) {
+        setMessage(""); // Clear the input field
+      } else {
+        console.error("Message not sent:", res.statusText);
+      }
     }
   };
+
+  if (!roomId) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="max-w-md mx-auto p-4">
@@ -74,7 +61,7 @@ const Room = () => {
       <div className="mb-4 bg-gray-100 p-4 rounded-md h-64 overflow-y-auto">
         {messages.map((msg, index) => (
           <p key={index} className="mb-2">
-            <strong>User:</strong> {msg.text}
+            <strong>User:</strong> {msg}
           </p>
         ))}
       </div>
