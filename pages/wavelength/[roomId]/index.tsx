@@ -1,6 +1,5 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import Input from "../../../components/Input";
