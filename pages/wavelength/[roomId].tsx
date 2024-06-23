@@ -3,8 +3,8 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
-import Input from "../../../components/Input";
-import Button from "../../../components/Button";
+import Input from "../../components/Input";
+import Button from "../../components/Button";
 
 let socket: any;
 
@@ -14,30 +14,34 @@ const Room = () => {
   const [messages, setMessages] = useState<any[]>([]);
 
   useEffect(() => {
-    if (roomId) {
-      socket = io({
-        path: "/socket.io", // Ensure the path matches the server configuration
-      });
+    fetch("/api/socket"); // Initialize the Socket.IO server
 
-      socket.on("connect", () => {
-        console.log("Connected to socket.io server");
-        socket.emit("joinRoom", roomId);
-        console.log(`Joined room: ${roomId}`);
-      });
+    socket = io({
+      path: "/api/socket", // Ensure the path matches the server configuration
+      transports: ["websocket"], // Use WebSocket transport
+    });
 
-      socket.on("message", (msg: any) => {
-        console.log("Message received:", msg);
-        setMessages((prevMessages) => [...prevMessages, msg]);
-      });
+    socket.on("connect", () => {
+      console.log("Connected to socket.io server");
+      socket.emit("joinRoom", roomId);
+      console.log(`Joined room: ${roomId}`);
+    });
 
-      socket.on("disconnect", () => {
-        console.log("Disconnected from socket.io server");
-      });
+    socket.on("message", (msg: any) => {
+      console.log("Message received:", msg);
+      setMessages((prevMessages) => [...prevMessages, msg]);
+    });
 
-      return () => {
+    socket.on("disconnect", () => {
+      console.log("Disconnected from socket.io server");
+    });
+
+    return () => {
+      if (socket) {
         socket.disconnect();
-      };
-    }
+        console.log("Socket disconnected");
+      }
+    };
   }, [roomId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,10 +53,13 @@ const Room = () => {
       const msg = { room: roomId, text: message };
       socket.emit("message", msg);
       console.log("Message sent:", msg);
-      setMessages((prevMessages) => [...prevMessages, msg]); // Add to chat history
       setMessage(""); // Clear the input field
     } else {
-      console.log("Message not sent:", { socket, roomId, message });
+      console.log("Message not sent:", {
+        socket: socket,
+        roomId,
+        message,
+      });
     }
   };
 
