@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Pusher from "pusher-js";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
 import { pusherClient } from "../../lib/pusher";
@@ -14,9 +13,6 @@ const Room = () => {
 
   useEffect(() => {
     if (!roomId) return;
-
-    // Enable Pusher logging - don't include this in production
-    Pusher.logToConsole = true;
 
     const channel = pusherClient.subscribe(`public-${roomId}`);
     channel.bind("message", (data: { message: string }) => {
