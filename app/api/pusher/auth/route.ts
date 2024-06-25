@@ -3,13 +3,13 @@ import { getPusherInstance } from "../../../lib/pusher";
 const pusherServer = getPusherInstance();
 
 export async function POST(req: Request) {
-  console.log("authenticating pusher perms...");
+  console.log("Authenticating Pusher permissions...");
   const data = await req.text();
   const [socketId, channelName] = data
     .split("&")
     .map((str) => str.split("=")[1]);
 
-  // logic to check user permissions
+  // Logic to check user permissions (if necessary)
 
   const authResponse = pusherServer.authorizeChannel(socketId, channelName);
 
