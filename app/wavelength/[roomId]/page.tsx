@@ -18,7 +18,7 @@ const Room = () => {
     // Enable Pusher logging - don't include this in production
     Pusher.logToConsole = true;
 
-    const channel = pusherClient.subscribe(`presence-${roomId}`);
+    const channel = pusherClient.subscribe(`public-${roomId}`);
     channel.bind("message", (data: { message: string }) => {
       console.log("Message received:", data.message);
       setMessages((prevMessages) => [...prevMessages, data.message]);
@@ -26,7 +26,7 @@ const Room = () => {
 
     return () => {
       channel.unbind("message");
-      pusherClient.unsubscribe(`presence-${roomId}`);
+      pusherClient.unsubscribe(`public-${roomId}`);
     };
   }, [roomId]);
 

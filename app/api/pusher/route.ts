@@ -3,10 +3,11 @@ import { getPusherInstance } from "../../lib/pusher";
 
 const pusherServer = getPusherInstance();
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   try {
     const { message, roomId } = await req.json();
-    await pusherServer.trigger(`presence-${roomId}`, "message", {
+    console.log(`Triggering event for room ${roomId} with message: ${message}`);
+    await pusherServer.trigger(`public-${roomId}`, "message", {
       message,
       user: "User", // Replace with actual user data if available
       date: new Date(),
