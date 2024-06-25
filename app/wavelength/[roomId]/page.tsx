@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import Pusher from "pusher-js";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
+import axios from "axios";
+import { pusherClient } from "../../lib/pusher";
 
 const Room = () => {
   const { roomId } = useParams();
@@ -12,44 +14,70 @@ const Room = () => {
   const [messages, setMessages] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!roomId) return;
-
-    // Initialize Pusher
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-    });
-
-    const channel = pusher.subscribe(`presence-${roomId}`);
-    channel.bind("message", (data: { message: string }) => {
-      console.log("Message received:", data.message); // Add this log to verify message reception
-      setMessages((prevMessages) => [...prevMessages, data.message]);
-    });
+    const channel = pusherClient
+      .subscribe("private-chat")
+      .bind("evt::test", (data: any) => {
+        console.log("test", data);
+        setMessages([...messages, data]);
+      });
 
     return () => {
-      pusher.unsubscribe(`presence-${roomId}`);
+      channel.unbind();
     };
-  }, [roomId]);
+  }, [messages]);
+
+  const handleTestClick = async () => {
+    let data = await fetch("/api/pusher", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: "test" }),
+    });
+    let json = await data.json();
+    console.log(json);
+  };
+
+  // useEffect(() => {
+  //   if (!roomId) return;
+
+  //   // Initialize Pusher
+  //   const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+  //     cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+  //   });
+
+  //   const channel = pusher.subscribe(`presence-${roomId}`);
+  //   channel.bind("message", (data: { message: string }) => {
+  //     console.log("Message received:", data.message); // Add this log to verify message reception
+  //     setMessages((prevMessages) => [...prevMessages, data.message]);
+  //   });
+
+  //   return () => {
+  //     pusher.unsubscribe(`presence-${roomId}`);
+  //   };
+  // }, [roomId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
 
-  const sendMessage = async () => {
-    if (message) {
-      const res = await fetch("/api/pusher", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message, roomId }),
-      });
-      if (res.ok) {
-        setMessage(""); // Clear the input field
-      } else {
-        console.error("Message not sent:", res.statusText);
-      }
-    }
-  };
+  // const sendMessage = async () => {
+  //   if (message) {
+  //     await axios.post("/api/pusher", { message: messageToSend, sender });
+  //     const res = await fetch("/api/pusher", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ message, roomId }),
+  //     });
+  //     if (res.ok) {
+  //       setMessage(""); // Clear the input field
+  //     } else {
+  //       console.error("Message not sent:", res.statusText);
+  //     }
+  //   }
+  // };
 
   if (!roomId) {
     return <div>Loading...</div>;
@@ -71,7 +99,7 @@ const Room = () => {
         value={message}
         onChange={handleInputChange}
       />
-      <Button onClick={sendMessage} className="mt-4 w-full">
+      <Button onClick={handleTestClick} className="mt-4 w-full">
         Send
       </Button>
     </div>

@@ -1,18 +1,21 @@
 import { NextResponse } from "next/server";
-import Pusher from "pusher";
+import { getPusherInstance } from "../../lib/pusher";
+const pusherServer = getPusherInstance();
 
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID!,
-  key: process.env.PUSHER_KEY!,
-  secret: process.env.PUSHER_SECRET!,
-  cluster: process.env.PUSHER_CLUSTER!,
-  useTLS: true,
-});
+export async function POST(req: Request, res: Response) {
+  try {
+    await pusherServer.trigger("private-chat", "evt::test", {
+      message: "test",
+      user: "ree",
+      date: new Date(),
+    });
 
-export async function POST(request: Request) {
-  const { message, roomId } = await request.json();
-  await pusher.trigger(`presence-${roomId}`, "message", {
-    message,
-  });
-  return NextResponse.json({ message: "Message sent" });
+    return NextResponse.json({ message: "Sockets tested" }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Failed to test sockets", error: error },
+      { status: 500 }
+    );
+  }
 }
