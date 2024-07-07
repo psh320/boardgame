@@ -8,7 +8,7 @@ import { auth } from "../lib/firebaseConfig";
 
 interface AuthContextProps {
   user: User | null;
-  userName: string | null;
+  userName: string;
   loading: boolean;
   login: (name: string) => Promise<void>;
   logout: () => void;
@@ -21,7 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userName, setUserName] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = () => {
     auth.signOut();
     setUser(null);
-    setUserName(null);
+    setUserName("");
     router.push("/login");
   };
 

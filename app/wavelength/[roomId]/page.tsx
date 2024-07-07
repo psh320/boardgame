@@ -1,3 +1,4 @@
+// app/wavelength/[roomId]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,6 +6,8 @@ import { useParams, useSearchParams } from "next/navigation";
 import Pusher from "pusher-js";
 import { pusherClient } from "../../lib/pusher";
 import StartScreen from "./components/StartScreen";
+import { useAuth } from "../../context/AuthContext";
+import { getDatabase, onValue, ref, set } from "firebase/database";
 // Import other screens when ready
 // import HintScreen from './components/HintScreen';
 // import GuessScreen from './components/GuessScreen';
@@ -16,40 +19,36 @@ interface User {
 }
 
 const Room = () => {
+  const { user, loading, userName, setUserName } = useAuth();
   const { roomId } = useParams();
-  const searchParams = useSearchParams();
-  const userName = searchParams.get("name") || "Anonymous";
   const [users, setUsers] = useState<User[]>([{ name: userName, score: 0 }]);
   const [currentScreen, setCurrentScreen] = useState<
     "start" | "hint" | "guess" | "result"
   >("start");
   const [roundStarter, setRoundStarter] = useState<string | null>(null);
+  const db = getDatabase();
 
   useEffect(() => {
     if (!roomId) return;
 
-    Pusher.logToConsole = true;
-
-    const channel = pusherClient.subscribe(`public-${roomId}`);
-    channel.bind("start-round", (data: { starter: string }) => {
-      setRoundStarter(data.starter);
-      setCurrentScreen("hint");
+    const roomRef = ref(db, `rooms/${roomId}`);
+    const unsubscribe = onValue(roomRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setUsers(data.users ? Object.values(data.users) : []);
+        setCurrentScreen(data.gameState?.currentScreen);
+        setRoundStarter(data.gameState?.roundStarter);
+      }
     });
 
-    // Other bindings for other screens (hint, guess, result) go here
-
-    return () => {
-      channel.unbind_all();
-      pusherClient.unsubscribe(`public-${roomId}`);
-    };
-  }, [roomId]);
+    return () => unsubscribe();
+  }, [roomId, db]);
 
   const startRound = async (starter: string) => {
     setRoundStarter(starter);
-    await fetch("/api/pusher/start-round", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roomId, starter }),
+    await set(ref(db, `rooms/${roomId}/gameState`), {
+      currentScreen: "hint",
+      roundStarter: starter,
     });
     setCurrentScreen("hint");
   };

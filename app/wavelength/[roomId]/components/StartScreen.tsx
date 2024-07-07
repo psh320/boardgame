@@ -26,10 +26,9 @@ const StartScreen: React.FC<StartScreenProps> = ({
   const [userList, setUserList] = useState<User[]>(users);
 
   useEffect(() => {
-    // Mockup for adding new users (In reality, this would be handled by Pusher)
-    const newUser = { name: "New User", score: 0 };
-    setUserList((prevUsers) => [...prevUsers, newUser]);
-  }, [roomId]);
+    // Update user list from props
+    setUserList(users);
+  }, [users]);
 
   const handleStartRound = () => {
     onStartRound(userName);
