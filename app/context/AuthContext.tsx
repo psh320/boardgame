@@ -11,6 +11,7 @@ interface AuthContextProps {
   loading: boolean;
   login: (name: string) => Promise<void>;
   logout: () => void;
+  setUserName: (name: string) => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -23,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -38,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     return () => unsubscribe();
-  }, [router]);
+  }, [pathname, router]);
 
   const login = async (name: string) => {
     setLoading(true);
@@ -62,7 +64,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, userName, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, userName, loading, login, logout, setUserName }}
+    >
       {children}
     </AuthContext.Provider>
   );

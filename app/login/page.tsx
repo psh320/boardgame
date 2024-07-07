@@ -5,40 +5,13 @@ import { useRouter } from "next/navigation";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { database } from "../lib/firebaseConfig";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const auth = getAuth();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const userId = user.uid;
-        router.push(`/?name=${encodeURIComponent(name)}&userId=${userId}`);
-      } else {
-        setLoading(false);
-      }
-    });
-    return () => unsubscribe();
-  }, [auth, name, router]);
-
-  const handleLogin = async () => {
-    if (!name.trim()) return;
-
-    try {
-      const result = await signInAnonymously(auth);
-      const userId = result.user.uid;
-      await set(ref(database, `users/${userId}`), {
-        name,
-        score: 0,
-      });
-      router.push(`/games?name=${encodeURIComponent(name)}&userId=${userId}`);
-    } catch (error) {
-      console.error("Error signing in anonymously:", error);
-    }
-  };
+  const { user, loading, userName, login } = useAuth();
 
   if (loading) {
     return <div>Loading...</div>;
@@ -55,10 +28,10 @@ const Login = () => {
         className="border p-2 w-full"
       />
       <button
-        onClick={handleLogin}
+        onClick={() => login(name)}
         className="mt-4 w-full bg-blue-500 text-white p-2 rounded"
       >
-        Join
+        Set Name
       </button>
     </div>
   );

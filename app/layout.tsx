@@ -25,16 +25,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <meta property="og:title" content="Boardgame App Online" />
         <meta property="og:url" content="https://boardgame-silk.vercel.app/" />
         <meta property="og:type" content="website" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            name: "Boardgame App Online",
-            url: "https://boardgame-silk.vercel.app/",
-            description:
-              "Play board games online with your friends. Join us for an exciting experience of fun and strategy.",
-          })}
-        </script>
       </head>
       <body className="flex flex-col min-h-screen">
         <header className="bg-gray-800 text-white p-4">
