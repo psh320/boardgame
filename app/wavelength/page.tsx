@@ -1,3 +1,4 @@
+// app/wavelength/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -8,12 +9,10 @@ import generateRoomId from "../../utils/generateRoomId";
 
 const WavelengthHome = () => {
   const router = useRouter();
-  const [roomId, setRoomId] = useState("");
   const [joinRoomId, setJoinRoomId] = useState("");
 
   const createRoom = async () => {
     const newRoomId = generateRoomId();
-    setRoomId(newRoomId);
     router.push(`/wavelength/${newRoomId}`);
   };
 
@@ -31,11 +30,10 @@ const WavelengthHome = () => {
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Welcome to Wavelength</h1>
+      <h1 className="text-2xl font-bold mb-4">Wavelength</h1>
       <Button onClick={createRoom} className="mb-4 w-full">
         Create Room
       </Button>
-      {roomId && <p className="mb-4">Room ID: {roomId}</p>}
       <Input
         type="text"
         placeholder="Enter room number"

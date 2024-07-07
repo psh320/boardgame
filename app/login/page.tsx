@@ -1,10 +1,9 @@
+// app/login/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
-import { ref, set } from "firebase/database";
-import { database } from "../lib/firebaseConfig";
+import { getAuth } from "firebase/auth";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
