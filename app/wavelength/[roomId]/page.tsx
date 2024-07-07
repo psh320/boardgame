@@ -31,7 +31,7 @@ const Room = () => {
   useEffect(() => {
     if (!roomId) return;
 
-    const roomRef = ref(db, `rooms/${roomId}`);
+    const roomRef = ref(db, `wavelength/rooms/${roomId}`);
     const unsubscribe = onValue(roomRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -46,7 +46,7 @@ const Room = () => {
 
   const startRound = async (starter: string) => {
     setRoundStarter(starter);
-    await set(ref(db, `rooms/${roomId}/gameState`), {
+    await set(ref(db, `wavelength/rooms/${roomId}/gameState`), {
       currentScreen: "hint",
       roundStarter: starter,
     });

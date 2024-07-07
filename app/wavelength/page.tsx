@@ -45,7 +45,7 @@ const WavelengthHome = () => {
 
   const joinRoom = async () => {
     if (joinRoomId && user) {
-      const roomRef = ref(db, `rooms/${joinRoomId}`);
+      const roomRef = ref(db, `wavelength/rooms/${joinRoomId}`);
       const roomSnapshot = await get(roomRef);
 
       if (roomSnapshot.exists()) {
